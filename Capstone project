@@ -1,0 +1,112 @@
+create database loan;
+use loan;
+drop table loandetail;
+create table loandetail ( loanid int not null, loanamount int not null, loanintrst int, loanstatus char (30));
+
+insert into loandetail value 
+                       (001,100000,2,'sanctioned'),              
+                       (002,120000,5,'notsanctioned'),
+                       (003,130000,6,'sanctioned'),
+                       (004,140000,3,'notsanctioned'),
+                       (005,150000,'2','sanctioned'),
+                       (006,160000,'2','notsanctioned'),
+                       (007,145000,'4','sanctioned'),
+                       (008,200000,'6','sanctioned'),
+                       (009,320000,'5','sanctioned'),
+                       (010,565000,'5','sanctioned'),
+                       (011,600000,'5','notsanctioned'),
+                       (012,460000,'4','sanctioned'),
+                       (013,485000,'5','sanctioned'),
+                       (014,575000,'7','notsanctioned'),
+                       (015,140000,'3','notsanctioned'),
+                       (016,100000,'2','sanctioned'),              
+                       (017,120000,'5','notsanctioned'),
+                       (018,130000,'3','sanctioned'),
+                       (019,140000,'3','notsanctioned'),
+                       (020,150000,'2','sanctioned');
+                       
+     alter table loandetail add primary key(loanid);  
+     
+     
+	create table clientdetail (loanid int ,gender char(10) not null ,
+                                clientid int not null,clientname char(50)not null,clientincome int not null,
+                                branch char(15)not null,address char(25)not null,
+                                primary key (clientid),
+                                foreign key (loanid)
+                                References loandetail (loanid));
+	insert into clientdetail value 
+                                   (001,'male',1000,'Ajith',25000,'chennai','anakaputhur'),
+                                   (002,'male',1001,'Ajithkumar',35000,'erode','sivagiri'),  
+                                   (003,'female',1002,'sheelu',15000,'salem','jj nagar'),
+                                   (004,'male',1003,'kavin',55000,'chennai','anakaputhur'),
+                                   (006,'female',1004,'shalini',35000,'chennai','anakaputhur'),
+                                   (007,'male',1005,'ranjith',25000,'salem','jj nagar'),
+                                   (008,'male',1006,'raguram',25000,'chennai','anakaputhur'),
+                                   (009,'female',1007,'vincy',55000,'erode','sivagiri'),
+                                   (010,'male',1008,'shravan',65000,'chennai','anakaputhur'),
+                                   (011,'male',1009,'sasi',85000,'erode','sivagiri'),
+                                   (012,'female',1010,'priya',95000,'salem','jj nagar'),
+                                   (013,'male',1011,'madhan',45000,'erode','sivagiri'),
+                                   (014,'male',1012,'jack',65000,'chennai','anakaputhur'),
+                                   (015,'female',1013,'nazriya',55000,'chennai','anakaputhur'),
+                                   (016,'male',1014,'thoufeq',75000,'chennai','anakaputhur'),
+                                   (017,'female',1015,'sanjana',45000,'erodei','sivagiri'),
+                                   (018,'male',1016,'salman',55000,'salem','jj nagar'),
+                                   (019,'male',1017,'ahamed',60000,'chennai','anakaputhur'),
+                                   (020,'male',1018,'david',77000,'erode','sivagiri');
+                                   
+     create table loaninfo ( loantype char(30) not null, clientid int not null,foreign key (clientid) references clientdetail (clientid));
+     drop table loaninfo;
+     insert into loaninfo value 
+                                ('personal loan',1000),
+                                ('medical loan',1001),
+                                ('educational loan',1002),
+                                ('personal loan',1003),
+                                ('educational loan',1004),
+                                ('personal loan',1005),
+                                ('educational loan',1006),
+                                ('personal loan',1007),
+                                ('medical loan',1008),
+                                ('personal loan',1009),
+                                ('personal loan',1010),
+                                ('medical loan',1011),
+                                ('personal loan',1012),
+                                ('educational loan',1013),
+                                ('medical loan',1014),
+                                ('personal loan',1015),
+                                ('educational loan',1016),
+                                ('medical loan',1017),
+                                ('personal loan',1018);
+                                
+
+
+# 1.) Analyze the total amount spend by the bank in branch wise ?
+# 2.) which type of loan mostly availed by the customer?
+# 3.) How many sanctined and non-sanctioned loan branch wise ?
+# 4.) overall interest collected for sanctioned loan in all branch?
+
+
+select sum(loanamount) as total,loanstatus from loandetail group by loanstatus;
+
+#Q1
+select clientdetail.branch,sum(loandetail.loanamount) as Total_Loan_Amount from 
+clientdetail join loandetail on clientdetail.loanid=loandetail.loanid  
+group by clientdetail.branch;
+
+#Q2
+Select loantype, count(*) as num_loans from loaninfo
+Group by loantype order by num_loans desc;
+
+#Q3
+Select branch, loanstatus, Count(*) as count from clientdetail
+join loandetail on clientdetail.loanid = loandetail.loanid
+group by branch,loanstatus;
+
+#Q4
+Select SUM(loanamount * loanintrst / 100) AS "Interest collcted"
+From loandetail where loanstatus = 'sanctioned';
+
+
+
+
+
